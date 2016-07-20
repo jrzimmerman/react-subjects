@@ -1,38 +1,72 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-let isOpen = false
+const ContentToggle = React.createClass({
+  getInitialState() {
+    return {
+      isOpen: false
+    }
+  },
+  handleClick() {
+    this.setState({ isOpen: !this.state.isOpen })
 
-function handleClick() {
-  isOpen = !isOpen
-  updateThePage()
-}
+    if (this.props.onToggle) this.props.onToggle()
+  },
+  render() {
+    let summaryClassName = 'ContentToggle__Summary'
 
-function ContentToggle() {
-  let summaryClassName = 'ContentToggle__Summary'
+    if (this.state.isOpen)
+      summaryClassName += ' ContentToggle__Summary--is-open'
 
-  if (isOpen)
-    summaryClassName += ' ContentToggle__Summary--is-open'
+    return (
+      <div className="ContentToggle">
+        <button onClick={this.handleClick} className={summaryClassName}>
+          {this.props.summary}
+        </button>
+        {this.state.isOpen && (
+          <div className="ContentToggle__Details">
+            {this.props.children}
+          </div>
+        )}
+      </div>
+    )
+  }
 
-  return (
-    <div className="ContentToggle">
-      <button onClick={handleClick} className={summaryClassName}>
-        Tacos
-      </button>
-      {isOpen && (
-        <div className="ContentToggle__Details">
+})
+
+const App = React.createClass({
+  getInitialState() {
+    return {
+      tacos: 0,
+      burritos: 0
+    }
+  },
+
+  handleToggle(whichOne) {
+    this.setState({
+      [whichOne]: this.state[whichOne] + 1
+    })
+  },
+
+  render() {
+    return (
+      <div>
+        <h1>Tacos: {this.state.tacos}</h1>
+        <h1>Burritos: {this.state.burritos}</h1>
+        <ContentToggle onToggle={() => this.handleToggle('tacos')} summary={`Tacos ${this.state.tacos}`}>
           <p>A taco is a traditional Mexican dish composed of a corn or wheat tortilla folded or rolled around a filling.</p>
-        </div>
-      )}
-    </div>
-  )
-}
+        </ContentToggle>
+        <ContentToggle onToggle={() => this.handleToggle('burritos')} summary={`Burritos ${this.state.burritos}`}>
+          <p>A taco is a traditional Mexican dish composed of a wheat tortilla rolled around a filling.</p>
+        </ContentToggle>
+      </div>
+    )
+  }
+})
 
-function updateThePage() {
-  render(<ContentToggle/>, document.getElementById('app'))
-}
+render(<App/>, document.getElementById('app'))
 
-updateThePage()
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Let's encapsulate state in an object and call it what it really is. Then, add
