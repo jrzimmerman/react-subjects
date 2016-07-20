@@ -28,14 +28,43 @@ const DATA = {
   ]
 }
 
+let filterType = 'mexican'
+let sortAsc = true
+
+
+function handleFilterTypeChange(event) {
+  filterType = event.target.value
+  updateThePage()
+}
+
+function handleToggle() {
+  sortAsc = !sortAsc
+  updateThePage()
+}
+
 function Menu() {
+  const items = DATA.items
+  .filter((item) => (
+    item.type === filterType
+  ))
+  .sort(sortBy(sortAsc ? 'name' : '-name'))
+  .map((item) => (
+    <li key={item.id}>{item.name}</li>
+  ))
   return (
     <div>
-      Open the console, you have failing tests.
+      <h1>{DATA.title}</h1>
+      <select defaultValue={filterType} onChange={handleFilterTypeChange}>
+        <option value="mexican">mexican</option>
+        <option value="english">english</option>
+      </select>
+      <button onClick={handleToggle}>Toggle Sort</button>
+      <ul>{items}</ul>
     </div>
   )
 }
 
-render(<Menu/>, document.getElementById('app'), () => {
-  require('./tests').run()
-})
+function updateThePage() {
+  render(<Menu/>, document.getElementById('app'))
+}
+updateThePage()

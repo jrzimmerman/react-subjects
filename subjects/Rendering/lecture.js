@@ -1,6 +1,28 @@
 import React from 'react'
 import { render } from 'react-dom'
 
+// const { select, option, div, h1 } = React.DOM
+
+// const alertHi = () => (alert('hi'))
+
+// const el = (
+//   <div>
+//     <h1 className="hot">Hello JSX</h1>
+//     <select>
+//       <option>one</option>
+//       <option>two</option>
+//       <option>three</option>
+//     </select>
+//     <br/>
+//     <button onClick={alertHi}>Click me</button>
+//   </div>
+// )
+
+// render(
+//   el,
+//   document.getElementById('app')
+// )
+
 ////////////////////////////////////////////////////////////////////////////////
 // React components are really just functions that take attributes
 //const element = React.DOM.input({type: 'text'})
@@ -111,20 +133,20 @@ import { render } from 'react-dom'
 // - ... how to create a filter
 
 
-//const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-//function padMonth(index) {
-  //const realIndex = index + 1
-  //return realIndex > 9 ? ''+realIndex : '0'+realIndex
-//}
+function padMonth(index) {
+  const realIndex = index + 1
+  return realIndex > 9 ? ''+realIndex : '0'+realIndex
+}
 
-//render((
-  //<select>
-    //{months.map((month, index) => (
-      //<option>({padMonth(index)}) {month}</option>
-    //))}
-  //</select>
-//), document.getElementById('app'))
+render((
+  <select>
+    {months.map((month, index) => (
+      <option>({padMonth(index)}) {month}</option>
+    ))}
+  </select>
+), document.getElementById('app'))
 
 // Things you have to know
 // - JavaScript
