@@ -5,13 +5,63 @@ import serializeForm from 'form-serialize'
 ////////////////////////////////////////////////////////////////////////////////
 // Here's a simple <form>:
 
+// can get value from event.target.value or ref
+// ref can be string or function
+
 const Forms = React.createClass({
+  getInitialState() {
+    return {
+      firstName: 'Justin',
+      lastName: 'Zimmerman'
+    }
+  },
+
+  changeToAntonio() {
+    this.setState({
+      firstName: 'Antonio'
+    })
+  },
+
+  handleChange() {
+    console.log(this.myInput.value)
+  },
+
+  handleSubmit(event) {
+    event.preventDefault()
+    const query = serializeForm(event.target, { hash: true })
+    console.log(query)
+  },
+
   render() {
     return (
       <div>
         <h1>Forms</h1>
-        <form>
-          <input type="text"/>
+        <button onClick={this.changeToAntonio}>Change to Antonio</button>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            value={this.state.firstName}
+            ref="myInput"
+            name="firstName"
+            onChange={(event) => {
+              this.setState({
+                firstName: event.target.value
+              })
+            }}
+            type="text"
+          />
+          <input
+            value={this.state.lastName}
+            ref="myInput"
+            name="lastName"
+            onChange={(event) => {
+              this.setState({
+                lastName: event.target.value
+              })
+            }}
+            type="text"
+          />
+          <br/>
+          <button type="submit">Submit</button>
         </form>
       </div>
     )
