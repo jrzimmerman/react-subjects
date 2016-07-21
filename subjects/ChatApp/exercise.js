@@ -14,8 +14,10 @@
 //   sender and/or content
 ////////////////////////////////////////////////////////////////////////////////
 import React from 'react'
-import { render } from 'react-dom'
+import { render, findDOMNode } from 'react-dom'
 import { login, sendMessage, subscribeToMessages } from './utils/ChatUtils'
+import sortBy from 'sort-by'
+
 
 require('./styles')
 
@@ -43,64 +45,171 @@ unsubscribe() // stop listening for new messages
 The world is your oyster!
 */
 
-const Chat = React.createClass({
+const PinToBottom = React.createClass({
+  componentWillUpdate() {
+    const buffer = 10
+    const node = findDOMNode(this)
+    const { scrollHeight, scrollTop, clientHeight } = node
+    this.isAtBottom = clientHeight + scrollTop + buffer >= scrollHeight
+  },
+
+  componentDidUpdate() {
+    if(this.isAtBottom) {
+      const node = findDOMNode(this)
+      node.scrollTop = node.scrollHeight
+    }
+
+  },
+  render() {
+    return this.props.children
+  }
+})
+
+
+const Message = React.createClass({
+  propTypes: {
+    message: React.PropTypes.object.isRequired
+  },
 
   render() {
+    const { message } = this.props
     return (
-      <div className="chat">
-        <header className="chat-header">
-          <h1 className="chat-title">HipReact</h1>
-          <p className="chat-message-count"># messages: 3</p>
-        </header>
-        <div className="messages">
-          <ol className="message-groups">
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars1.githubusercontent.com/u/92839"/>
-              </div>
-              <ol className="messages">
-                <li className="message">So, check it out:</li>
-                <li className="message">QA Engineer walks into a bar.</li>
-                <li className="message">Orders a beer.</li>
-                <li className="message">Orders 0 beers.</li>
-                <li className="message">Orders 999999999 beers.</li>
-                <li className="message">Orders a lizard.</li>
-                <li className="message">Orders -1 beers.</li>
-                <li className="message">Orders a sfdeljknesv.</li>
-              </ol>
-            </li>
-          </ol>
-          <ol className="message-groups">
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars2.githubusercontent.com/u/100200"/>
-              </div>
-              <ol className="messages">
-                <li className="message">Haha</li>
-                <li className="message">Stop stealing other people's jokes :P</li>
-              </ol>
-            </li>
-          </ol>
-          <ol className="message-groups">
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars1.githubusercontent.com/u/92839"/>
-              </div>
-              <ol className="messages">
-                <li className="message">:'(</li>
-              </ol>
-            </li>
-          </ol>
-        </div>
-        <form className="new-message-form">
-          <div className="new-message">
-            <input ref="message" type="text" placeholder="say something..."/>
-          </div>
-        </form>
-      </div>
+      <li className="message">{message.text}</li>
     )
   }
+})
 
+const MessageGroups = React.createClass({
+  propTypes: {
+    messageGroups: React.PropTypes.array.isRequired
+  },
+
+  render() {
+    const { messageGroups } = this.props
+    const renderedMessages = messageGroups.map((group, index) => (
+      <ol key={index} className="message-groups">
+        <li className="message-group">
+          <div className="message-group-avatar">
+            <img src={group[0].avatarURL}/>
+          </div>
+          <ol className="messages">
+            {group.map((message) => (
+              <Message key={message._key} message={message}/>
+            ))}
+          </ol>
+        </li>
+      </ol>
+    ))
+    return (
+      <PinToBottom>
+        <div className="messages">
+          { renderedMessages }
+        </div>
+      </PinToBottom>
+    )
+  }
+})
+
+const MessageForm = React.createClass({
+  propTypes: {
+    auth: React.PropTypes.object
+  },
+
+  submitMessage(event) {
+    event.preventDefault()
+    const { auth } = this.props
+    sendMessage(
+      auth.uid,                       // the auth.uid string
+      auth.github.username,           // the username
+      auth.github.profileImageURL,    // the user's profile image
+      this.refs.message.value          // the text of the message
+    )
+    this.refs.message.value = ''
+  },
+
+  render() {
+    const { auth } = this.props
+    return (
+      <form className="new-message-form" onSubmit={this.submitMessage}>
+        <div className="new-message">
+          <input
+            ref="message"
+            type="text"
+            placeholder="say something..."
+          />
+        </div>
+      </form>
+    )
+  }
+})
+
+const Chat = React.createClass({
+
+  getInitialState() {
+    return {
+      auth: null,
+      messages: []
+    }
+  },
+
+  componentDidMount() {
+    login((err, auth) => {
+      this.setState({ auth })
+      subscribeToMessages((messages) => {
+        this.setState({ messages })
+      })
+    })
+  },
+
+  groupMessages(messages) {
+    const sortedMessages = messages
+      .filter(m => (/\S/).test(m.text)) // Only keep non-empty messages
+      .sort(sortBy('timestamp')) // Sort by timestamp
+
+    // Group subsequent messages from the same sender.
+    const messageGroups = []
+
+    let lastMessage, currentMessageGroup
+    sortedMessages.forEach(message => {
+      if (lastMessage && lastMessage.uid === message.uid) {
+        currentMessageGroup.push(message)
+      } else {
+        if (currentMessageGroup)
+          messageGroups.push(currentMessageGroup)
+
+        currentMessageGroup = [ message ]
+      }
+
+      lastMessage = message
+    })
+
+    if (currentMessageGroup && currentMessageGroup.length)
+      messageGroups.push(currentMessageGroup)
+    return messageGroups
+  },
+
+  render() {
+    let { messages, auth } = this.state
+    const messageGroups = this.groupMessages(messages)
+    let chatApp
+    if (!auth) {
+      chatApp = <div className="chat">Logging In...</div>
+    } else {
+      chatApp = (
+        <div className="chat">
+          <header className="chat-header">
+            <h1 className="chat-title">HipReact</h1>
+            <p className="chat-message-count"># messages: {messages.length}</p>
+          </header>
+          <MessageGroups messageGroups={messageGroups} messages={messages}/>
+          <MessageForm auth={auth}/>
+        </div>
+      )
+    }
+    return (
+      chatApp
+    )
+  }
 })
 
 render(<Chat/>, document.getElementById('app'))
