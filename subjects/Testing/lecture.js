@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 import './modules/mocha-setup'
 import React from 'react'
 import { render } from 'react-dom'
@@ -9,6 +10,51 @@ import ContentToggle from './modules/ContentToggle'
 import Droppable from './modules/Droppable'
 import StatefulContentToggle from './modules/StatefulContentToggle'
 import ContactList from '../Flux/solution/components/ContactList'
+
+describe('Droppable',() => {
+  it('accepts drops', () => {
+    const el = <Droppable/>
+    const div = document.createElement('div')
+    render(el, div)
+    Simulate.dragOver(div.children[0], {
+      dataTransfer: { types: [ 'Files' ] }
+    })
+    document.body.appendChild(div)
+    expect(div.innerHTML).toMatch(/Drop it/)
+  })
+})
+
+
+// describe('StatefulContentToggle', () => {
+//   it('opens and closes', () => {
+//     const el = <StatefulContentToggle summary="test">i am open</StatefulContentToggle>
+//     const div = document.createElement('div')
+//     render(el, div)
+//     expect(div.innerHTML).toNotMatch(/i am open/)
+//     Simulate.click(div.querySelector('button'))
+//     expect(div.innerHTML).toMatch(/i am open/)
+//   })
+// })
+
+
+// describe('ContentToggle', () => {
+//   it('renders the summary', () => {
+//     const el = <ContentToggle summary="test"/>
+//     const div = document.createElement('div')
+//     render(el, div)
+//     expect(div.innerHTML).toMatch(/test/)
+//   })
+
+//   it('renders the children when open', () => {
+//     const el = <ContentToggle isOpen={true} summary="test">the children</ContentToggle>
+//     const div = document.createElement('div')
+//     const HTML = renderToString(el)
+//     expect(HTML).toMatch(/the children/)
+//   })
+// })
+
+
+
 
 //describe('ContentToggle', () => {
 //  let div
