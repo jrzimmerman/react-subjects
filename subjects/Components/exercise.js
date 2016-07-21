@@ -35,17 +35,31 @@ styles.panel = {
 }
 
 const Tabs = React.createClass({
+  propTypes: {
+    data: React.PropTypes.array
+  },
+
+  getInitialState() {
+    return {
+      activeId: 1
+    }
+  },
+
+  toggleTab(id) {
+    this.setState({ activeId: id })
+  },
+
   render() {
+    const tabs = this.props.data.map((item) => (
+      <div key={item.id} onClick={() => this.toggleTab(item.id)} className="Tab" style={ this.state.activeId === item.id ? styles.activeTab : styles.tab}>
+        {item.name}
+      </div>
+    ))
     return (
       <div className="Tabs">
-        <div className="Tab" style={styles.activeTab}>
-          Active
-        </div>
-        <div className="Tab" style={styles.tab}>
-          Inactive
-        </div>
+        {tabs}
         <div className="TabPanel" style={styles.panel}>
-          Panel
+          {this.props.data[this.state.activeId - 1].description}
         </div>
       </div>
     )

@@ -2,16 +2,24 @@ import React from 'react'
 import { render } from 'react-dom'
 
 const ContentToggle = React.createClass({
+  propTypes: {
+    summary: React.PropTypes.string.isRequired,
+    children: React.PropTypes.node,
+    onToggle: React.PropTypes.func
+  },
+
   getInitialState() {
     return {
       isOpen: false
     }
   },
+
   handleClick() {
     this.setState({ isOpen: !this.state.isOpen })
 
     if (this.props.onToggle) this.props.onToggle()
   },
+
   render() {
     let summaryClassName = 'ContentToggle__Summary'
 
@@ -51,12 +59,18 @@ const App = React.createClass({
   render() {
     return (
       <div>
-        <h1>Tacos: {this.state.tacos}</h1>
-        <h1>Burritos: {this.state.burritos}</h1>
-        <ContentToggle onToggle={() => this.handleToggle('tacos')} summary={`Tacos ${this.state.tacos}`}>
+        <h6>Tacos: {this.state.tacos}</h6>
+        <h6>Burritos: {this.state.burritos}</h6>
+        <ContentToggle
+          onToggle={() => this.handleToggle('tacos')}
+          summary={`Tacos ${this.state.tacos}`}
+        >
           <p>A taco is a traditional Mexican dish composed of a corn or wheat tortilla folded or rolled around a filling.</p>
         </ContentToggle>
-        <ContentToggle onToggle={() => this.handleToggle('burritos')} summary={`Burritos ${this.state.burritos}`}>
+        <ContentToggle
+          onToggle={() => this.handleToggle('burritos')}
+          summary={`Burritos ${this.state.burritos}`}
+        >
           <p>A taco is a traditional Mexican dish composed of a wheat tortilla rolled around a filling.</p>
         </ContentToggle>
       </div>
