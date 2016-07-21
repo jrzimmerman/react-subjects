@@ -25,33 +25,33 @@ describe('Droppable',() => {
 })
 
 
-// describe('StatefulContentToggle', () => {
-//   it('opens and closes', () => {
-//     const el = <StatefulContentToggle summary="test">i am open</StatefulContentToggle>
-//     const div = document.createElement('div')
-//     render(el, div)
-//     expect(div.innerHTML).toNotMatch(/i am open/)
-//     Simulate.click(div.querySelector('button'))
-//     expect(div.innerHTML).toMatch(/i am open/)
-//   })
-// })
+describe('StatefulContentToggle', () => {
+  it('opens and closes', () => {
+    const el = <StatefulContentToggle summary="test">i am open</StatefulContentToggle>
+    const div = document.createElement('div')
+    render(el, div)
+    expect(div.innerHTML).toNotMatch(/i am open/)
+    Simulate.click(div.querySelector('button'))
+    expect(div.innerHTML).toMatch(/i am open/)
+  })
+})
 
 
-// describe('ContentToggle', () => {
-//   it('renders the summary', () => {
-//     const el = <ContentToggle summary="test"/>
-//     const div = document.createElement('div')
-//     render(el, div)
-//     expect(div.innerHTML).toMatch(/test/)
-//   })
+describe('ContentToggle', () => {
+  it('renders the summary', () => {
+    const el = <ContentToggle summary="test"/>
+    const div = document.createElement('div')
+    render(el, div)
+    expect(div.innerHTML).toMatch(/test/)
+  })
 
-//   it('renders the children when open', () => {
-//     const el = <ContentToggle isOpen={true} summary="test">the children</ContentToggle>
-//     const div = document.createElement('div')
-//     const HTML = renderToString(el)
-//     expect(HTML).toMatch(/the children/)
-//   })
-// })
+  it('renders the children when open', () => {
+    const el = <ContentToggle isOpen={true} summary="test">the children</ContentToggle>
+    const div = document.createElement('div')
+    const HTML = renderToString(el)
+    expect(HTML).toMatch(/the children/)
+  })
+})
 
 
 
